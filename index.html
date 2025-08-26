@@ -6,7 +6,7 @@
     <title>Baixar Ativos de Site</title>
     <!-- Tailwind CSS para estilização -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FileSaver.js para salvar o arquivo gerado -->
+    <!-- FileSaver.js para salvar o ficheiro gerado -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         /* Estilo para a fonte Inter */
@@ -38,7 +38,7 @@
 
         <!-- Área de Status e Logs -->
         <div id="status" class="bg-gray-900/50 border border-gray-700 rounded-lg p-4 h-56 overflow-y-auto text-sm font-mono">
-            <p class="text-gray-500">Aguardando URL para iniciar.....</p>
+            <p class="text-gray-500">Aguardando URL para iniciar...</p>
         </div>
     </div>
 
@@ -77,16 +77,9 @@
             downloadBtn.innerHTML = 'Processando...';
 
             // ===================================================================
-            // IMPORTANTE: Substitua a URL abaixo pela URL do seu serviço no Render
+            // URL do seu backend no Render (AGORA ATUALIZADA)
             // ===================================================================
-            const renderBackendUrl = 'https://meu-downloader-kqtj.onrender.com'; // <-- COLOQUE A SUA URL AQUI
-
-            if (renderBackendUrl === 'https://meu-downloader-kqtj.onrender.com') {
-                log('CONFIGURE A URL DO SEU BACKEND NO FICHEIRO index.html!', 'error');
-                downloadBtn.disabled = false;
-                downloadBtn.innerHTML = 'Baixar .zip';
-                return;
-            }
+            const renderBackendUrl = 'https://meu-downloader-kqtj.onrender.com';
 
             try {
                 const downloadUrl = `${renderBackendUrl}/download?url=${encodeURIComponent(url)}`;
