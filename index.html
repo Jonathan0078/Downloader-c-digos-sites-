@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baixar Ativos de Site</title>
+    <!-- Tailwind CSS para estilização -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FileSaver.js para salvar o arquivo gerado -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* Estilo para a fonte Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #downloadBtn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-2xl mx-auto p-6 md:p-8 bg-gray-800 rounded-2xl shadow-2xl border border-gray-700">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-cyan-400">Website Downloader</h1>
+            <p class="text-gray-400 mt-2">Cole a URL do site para baixar os ficheiros HTML, CSS e JS.</p>
+        </div>
+
+        <!-- Formulário de Entrada -->
+        <div class="flex flex-col sm:flex-row gap-4 mb-6">
+            <input type="url" id="urlInput" placeholder="https://exemplo.com" class="flex-grow bg-gray-700 text-white border-2 border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:ring-4 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all duration-300">
+            <button id="downloadBtn" class="bg-cyan-500 hover:bg-cyan-600 text-gray-900 font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Baixar .zip
+            </button>
+        </div>
+
+        <!-- Área de Status e Logs -->
+        <div id="status" class="bg-gray-900/50 border border-gray-700 rounded-lg p-4 h-56 overflow-y-auto text-sm font-mono">
+            <p class="text-gray-500">Aguardando URL para iniciar...</p>
+        </div>
+    </div>
+
+    <script>
+        const urlInput = document.getElementById('urlInput');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const statusDiv = document.getElementById('status');
+
+        // Função para adicionar logs na tela
+        function log(message, type = 'info') {
+            const p = document.createElement('p');
+            let prefix = '';
+            switch (type) {
+                case 'success': p.className = 'text-green-400'; prefix = '[SUCESSO]'; break;
+                case 'error': p.className = 'text-red-400'; prefix = '[ERRO]'; break;
+                case 'warning': p.className = 'text-yellow-400'; prefix = '[AVISO]'; break;
+                default: p.className = 'text-gray-300'; prefix = '[INFO]';
+            }
+            p.textContent = `${prefix} ${message}`;
+            statusDiv.appendChild(p);
+            statusDiv.scrollTop = statusDiv.scrollHeight;
+        }
+
+        downloadBtn.addEventListener('click', handleDownload);
+
+        async function handleDownload() {
+            const url = urlInput.value.trim();
+            if (!url) {
+                log('Por favor, insira uma URL válida.', 'error');
+                return;
+            }
+
+            statusDiv.innerHTML = '';
+            log(`Iniciando o processo para: ${url}`);
+            downloadBtn.disabled = true;
+            downloadBtn.innerHTML = 'Processando...';
+
+            // ===================================================================
+            // IMPORTANTE: Substitua a URL abaixo pela URL do seu serviço no Render
+            // ===================================================================
+            const renderBackendUrl = 'https://seu-servico.onrender.com'; // <-- COLOQUE A SUA URL AQUI
+
+            if (renderBackendUrl === 'https://seu-servico.onrender.com') {
+                log('CONFIGURE A URL DO SEU BACKEND NO FICHEIRO index.html!', 'error');
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = 'Baixar .zip';
+                return;
+            }
+
+            try {
+                const downloadUrl = `${renderBackendUrl}/download?url=${encodeURIComponent(url)}`;
+                log('A contactar o servidor no Render...');
+                
+                const response = await fetch(downloadUrl);
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: `O servidor respondeu com o status ${response.status}` }));
+                    throw new Error(errorData.error);
+                }
+
+                log('O servidor está a preparar o ficheiro .zip...');
+                const blob = await response.blob();
+                const domain = new URL(url).hostname;
+                saveAs(blob, `${domain}-assets.zip`);
+                log('Download concluído!', 'success');
+
+            } catch (error) {
+                log(`Ocorreu um erro: ${error.message}`, 'error');
+            } finally {
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar .zip';
+            }
+        }
+    </script>
+</body>
+</html>
+
